@@ -1,1 +1,0 @@
-# richardohrvall.github.io
