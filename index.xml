@@ -2,19 +2,19 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Richard Öhrvall</title>
-    <link>https://richardohrvall.github.io/index.xml</link>
+    <link>/index.xml</link>
     <description>Recent content on Richard Öhrvall</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>sv</language>
     <lastBuildDate>Mon, 23 Jan 2017 21:02:05 +0100</lastBuildDate>
-    <atom:link href="https://richardohrvall.github.io/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
       <title>Visualisering av temperaturen i Stockholm 2016</title>
-      <link>https://richardohrvall.github.io/2017/01/23/visualisering-av-temperaturen-i-stockholm-2016/</link>
+      <link>/2017/01/23/visualisering-av-temperaturen-i-stockholm-2016/</link>
       <pubDate>Mon, 23 Jan 2017 21:02:05 +0100</pubDate>
       
-      <guid>https://richardohrvall.github.io/2017/01/23/visualisering-av-temperaturen-i-stockholm-2016/</guid>
+      <guid>/2017/01/23/visualisering-av-temperaturen-i-stockholm-2016/</guid>
       <description>&lt;!-- BLOGDOWN-BODY-BEFORE
 
 /BLOGDOWN-BODY-BEFORE --&gt;
@@ -172,7 +172,7 @@ p &amp;lt;- p +
              label = &amp;quot;Data avser dygnsmedeltemperatur för Stockholm år 2016 i förhållande till&amp;quot;, 
              size=3, colour=&amp;quot;gray30&amp;quot;, hjust = 0) +
     annotate(&amp;quot;text&amp;quot;, x = 5, y = 33, 
-             label = &amp;quot;hur det har sett ut 1961-2014. Genomsnittstemperaturen för hela 2016 var 8,2°,&amp;quot;, 
+             label = &amp;quot;hur det har sett ut 1961-2015. Genomsnittstemperaturen för hela 2016 var 8,2°,&amp;quot;, 
              size=3, colour=&amp;quot;gray30&amp;quot;, hjust = 0) +
     annotate(&amp;quot;text&amp;quot;, x = 5, y = 31, 
              label = &amp;quot;vilket är 1° över genomsnittet för 1961-2015. Data kommer från SMHI.&amp;quot;, 
@@ -202,7 +202,7 @@ p &amp;lt;- p +
     annotate(&amp;quot;text&amp;quot;, x = 184, y = -14.3, label = &amp;quot;Lägsta medeltemperatur&amp;quot;, size=2.5, colour=&amp;quot;gray30&amp;quot;, hjust = 0)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Sedan är det bara att ta fram grafen. Visst ser den helt ok ut?&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;print(p)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;https://richardohrvall.github.io/2017/01/23/visualisering-av-temperaturen-i-stockholm-2016/figures/weather-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;#####../content/post/2017-01-23-visualisering-av-temperaturen-i-stockholm_files/figure-html/weather-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 
 
 &lt;!-- BLOGDOWN-HEAD
@@ -216,10 +216,10 @@ p &amp;lt;- p +
     
     <item>
       <title>Om</title>
-      <link>https://richardohrvall.github.io/about/</link>
+      <link>/about/</link>
       <pubDate>Thu, 05 May 2016 21:48:51 -0700</pubDate>
       
-      <guid>https://richardohrvall.github.io/about/</guid>
+      <guid>/about/</guid>
       <description>&lt;p&gt;Jag heter Richard Öhrvall. Den här webbsidan är ett test för att se om jag ska börja blogga med hjälp av RStudio. Min vanliga webbsida hittar du &lt;a href=&#34;http://richardohrvall.com&#34;&gt;&lt;strong&gt;här&lt;/strong&gt;&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;Innehållet här har jag skapat med hjälp av R-paketet &lt;a href=&#34;https://github.com/rstudio/blogdown&#34;&gt;&lt;strong&gt;blogdown&lt;/strong&gt;&lt;/a&gt;. Webbsidan ligger i GitHub och är skapad i Hugo. Temat kommer från &lt;a href=&#34;https://github.com/jrutheiser/hugo-lithium-theme&#34;&gt;@jrutheiser/hugo-lithium-theme&lt;/a&gt;, men har modifierats av &lt;a href=&#34;https://github.com/yihui/hugo-lithium-theme&#34;&gt;Yihui Xie&lt;/a&gt; och till viss del av mig själv.&lt;/p&gt;
