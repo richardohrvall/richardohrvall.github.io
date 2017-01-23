@@ -6,24 +6,203 @@
     <description>Recent content in Posts on Richard Öhrvall</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>sv</language>
-    <lastBuildDate>Wed, 18 Jan 2017 16:23:38 +0100</lastBuildDate>
+    <lastBuildDate>Mon, 23 Jan 2017 21:02:05 +0100</lastBuildDate>
     <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>Test</title>
-      <link>/2017/01/18/test/</link>
-      <pubDate>Wed, 18 Jan 2017 16:23:38 +0100</pubDate>
+      <title>Visualisering av vädret i Stockholm</title>
+      <link>/2017/01/23/visualisering-av-v%C3%A4dret-i-stockholm/</link>
+      <pubDate>Mon, 23 Jan 2017 21:02:05 +0100</pubDate>
       
-      <guid>/2017/01/18/test/</guid>
+      <guid>/2017/01/23/visualisering-av-v%C3%A4dret-i-stockholm/</guid>
       <description>&lt;!-- BLOGDOWN-BODY-BEFORE
 
 /BLOGDOWN-BODY-BEFORE --&gt;
 
-&lt;p&gt;Det här är bara ett test.&lt;/p&gt;
-&lt;div id=&#34;testar-vidare&#34; class=&#34;section level2&#34;&gt;
-&lt;h2&gt;Testar vidare&lt;/h2&gt;
-&lt;p&gt;Test, test.&lt;/p&gt;
-&lt;/div&gt;
+&lt;p&gt;Jag har i år tänkt börja använda statistikprogrammet R lite mer än tidigare. Förut har jag vanligtvis i huvudsak använt Stata för analyser, men jag har insett att R har andra möjligheter. För att komma igång har jag bland annat startat den här bloggen, som är skapad i R med hjälp av paketet &lt;a href=&#34;https://github.com/rstudio/blogdown&#34;&gt;Blogdown&lt;/a&gt;. När man ska lära sig ett nytt statistikprogram är det bäst att ge sig i kast med någon uppgift och då jag länge har tänkt göra en svensk version av Edward Tuftes klassiska visualisering av vädret i New Yor kändes det som en lämplig uppgift. För mer bakgrund, se &lt;a href=&#34;http://wp.me/p8iRtK-Mj&#34;&gt;min vanliga blogg&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Det visade sig dock att Brad Boehmke redan tidigare hade &lt;a href=&#34;http://rpubs.com/bradleyboehmke/weather_graphic&#34;&gt;gjort något liknande i R&lt;/a&gt;. Hans graf skiljer sig något från NY Times graf, framför allt genom att han inte hade tillgång till högsta och lägsta temperatur för respektive dygn, utan endast dygnsmedeltemperaturen. I hans grafen blir därmed det aktuella årets temperatur över dagar illustrerat som en linje. Dessutom hade han inte tillgång till nederbörd, så den delen av den ursprungliga grafen finns inte med.&lt;/p&gt;
+&lt;p&gt;å jag har utgått från Boehmkes kod, men jag har ändrat den en del. Bland annat fick jag inte hans numrering av dagar att fungera och jag förstod inte varför han ritade samma graf för varje historiskt år. Dessutom valde Boehmke att låta intervallet avseende normala år representeras av konfidensintervallet för det historiska medelvärdet. Detta då han som sagt inte hade tillgång till varje dygns högsta och lägsta temperatur. Jag tycker inte att det är helt lyckat val då det visar osäkerheten i en skattning av ett historiskt medelvärde snarare än ett intervall som innefattar normala värden.&lt;/p&gt;
+&lt;p&gt;Man skulle i stället kunna låta intervallet motsvara två standardavvikelser i datamaterialet (dvs. inte dela med roten ur n) i förhållande till medelvärdet. Men jag föredrar att låta intervallet “normala temperaturer” avse de mittersta 50 procenten av tidigare års medeltemperaturer. Med andra ord: om man sorterar alla tidigare års medeltemperaturer för en viss dag från den lägsta till den högsta temperaturen så blir de procent av dagarna som ligger i mitten de dagar som betecknas “normala”. Staplarna i grafen blir därmed en variant av ett lådagram (eller boxplot på engelska), där den mörkare färgen blir själva lådan.&lt;/p&gt;
+&lt;p&gt;Samtidigt är jag inte någon rutinerad användare av R, så det finns ytterligare utrymme för förbättring. I vilket fall, jag har utgått från hans kod för att skapa en graf för Stockholm 2016. Vi börjar med att läsa in data från SMHI över medeltemperatur i Stockholm över tid. Jag hittad bara data uppdelat i två filer: en för historiska data (från 2916 och framåt) och en för de senaste 4 månaderna. Jag misstänker att det kan finnas något api någonstans som jag inte har sett, så den här delen av koden är lite stökig i nuvarande form. Men vi läser in, lägger ihop och fixar till de två filerna.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;library(dplyr)
+library(tidyr)
+library(tidyverse)
+library(lubridate)
+library(ggplot2)
+
+# Läs in data från SMHI, två semikolon-separerade filer - en med historiska data, en med mer aktuella
+# Ingen snygg lösning, men funkar
+file_hist &amp;lt;- &amp;quot;C:/Dropbox/data/väder/smhi-opendata_2_98210_20170118_165135.csv&amp;quot;
+sthm_hist &amp;lt;- read_csv2(file_hist,skip=9) #ges felmeddelande för vissa kolumner, men det är ok.
+file_recent &amp;lt;- &amp;quot;C:/Dropbox/data/väder/smhi-opendata_2_98210_20170122_172654.csv&amp;quot;
+sthm_recent &amp;lt;- read_csv2(file_recent,skip=9) #ges felmeddelande för vissa kolumner, men det är ok.
+
+# Byt namn på kolumner
+names(sthm_hist) &amp;lt;- c(&amp;quot;date_full&amp;quot;, &amp;quot;date2&amp;quot;, &amp;quot;date&amp;quot;, &amp;quot;temp&amp;quot;, &amp;quot;quality&amp;quot;, &amp;quot;noise&amp;quot;, &amp;quot;noise2&amp;quot;)
+names(sthm_recent) &amp;lt;- c(&amp;quot;date_full&amp;quot;, &amp;quot;date2&amp;quot;, &amp;quot;date&amp;quot;, &amp;quot;temp&amp;quot;, &amp;quot;quality&amp;quot;, &amp;quot;noise&amp;quot;, &amp;quot;noise2&amp;quot;)
+
+sthm_recent2 &amp;lt;- sthm_recent %&amp;gt;% filter(date &amp;gt; &amp;quot;2016-09-30&amp;quot;) # Ta bort de datum som redan finns i historiska data
+
+sthm &amp;lt;- bind_rows(sthm_hist, sthm_recent2) # Lägg ihop dataseten
+
+# Fixa till och rensa bort en del variabler
+weather &amp;lt;- sthm %&amp;gt;%
+        mutate(year = year(date), 
+        month = month(date),
+        day = day(date),
+        temp = as.numeric(temp)) %&amp;gt;%
+        select(temp, year, month, day, date)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Sedan skapar vi fyra nya dataset: ett med genomsnittliga temperaturer historiskt sett, ett med temperaturer 2016, ett rekordhöga temperaturer 2016 och ett med rekordlåga temperaturer 2016. Här avviker min kod ganska mycket från Boehmkes.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# skapa ett dataset med aggregerade data för åren 1961-2015
+past &amp;lt;- weather %&amp;gt;% 
+    mutate(leap=(month==2 &amp;amp; day==29))%&amp;gt;%
+    filter(leap==FALSE) %&amp;gt;% # Ta bort extra dag vid skottår
+    arrange(year,month, day) %&amp;gt;%
+    group_by(year) %&amp;gt;% 
+    mutate(day_no = seq_len(n())) %&amp;gt;%
+    ungroup() %&amp;gt;%
+    filter(year &amp;lt; 2016) %&amp;gt;%     # ta bort data för 2016 och senare
+    group_by(day_no) %&amp;gt;%
+    summarise(upper = max(temp), # Högsta temperatur  
+           lower = min(temp), # Lägsta temperatur
+           q1 = quantile(temp, probs = 0.25), # Kvartil 1
+           q3 = quantile(temp, probs = 0.75)) # Kvatil 3
+
+# Skapa ett dataset med temperaturer 2016
+present &amp;lt;- weather %&amp;gt;% 
+    mutate(leap=(month==2 &amp;amp; day==29)) %&amp;gt;%
+    filter(leap==FALSE) %&amp;gt;%
+    arrange(year,month, day) %&amp;gt;%
+    group_by(year) %&amp;gt;% 
+    mutate(day_no = seq_len(n())) %&amp;gt;%
+    ungroup() %&amp;gt;%
+    filter(year == 2016)  # Selektera 2016
+
+# Skapa ett dataset med de dagar 2016 som hade lägre temperaturer än tidigare år
+present_lows &amp;lt;- present %&amp;gt;%
+    left_join(past, by = &amp;quot;day_no&amp;quot;) %&amp;gt;%  # matcha historiska data med 2016 års data
+    mutate(record = ifelse(temp&amp;lt;lower, &amp;quot;Y&amp;quot;, &amp;quot;N&amp;quot;)) %&amp;gt;% # identifiera dagar m rekordlåg temp
+    filter(record == &amp;quot;Y&amp;quot;)  # selektera dagar m rekordlåg temp
+
+# Skapa ett dataset med de dagar 2016 som hade lägre temperaturer än tidigare år
+present_highs &amp;lt;- present %&amp;gt;%
+    left_join(past, by = &amp;quot;day_no&amp;quot;) %&amp;gt;%  # matcha historiska data med 2016 års data
+    mutate(record = ifelse(temp&amp;gt;upper, &amp;quot;Y&amp;quot;, &amp;quot;N&amp;quot;)) %&amp;gt;% # identifiera dagar m rekordlåg temp
+    filter(record == &amp;quot;Y&amp;quot;)  # selektera dagar m rekordlåg temp&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Sedan behöver vi fixa till lite med lablarna på y-axeln och skapa ett litet dataset med slumpmässig information för legenden.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;# funktion för att lägga till grad-symbol till lablar på y-axeln 
+dgr_fmt &amp;lt;- function(x, ...) {
+    parse(text = paste(x, &amp;quot;*degree&amp;quot;, sep = &amp;quot;&amp;quot;))
+}
+
+# skapa skalsteg på y-axeln
+a &amp;lt;- dgr_fmt(seq(-25,35, by=5))
+
+# skapa ett litet dataset för legenden avseende 2016 år temperatur 
+legend_data &amp;lt;- data.frame(x=seq(173,182),y=rnorm(10,-10,1))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Då är det bara att börja bygga ihop grafen. I ett första steg lägger vi in våra tre sorters värden: högsta/lägsta historiskt, normala värden historiskt (de 50 procent av åren som ligger i mitten av fördelningen, dvs. Q1-Q3) och dygnsmedeltemperaturen 2016.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p &amp;lt;- ggplot(past, aes(day_no, upper)) +
+    theme(plot.background = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.border = element_blank(),
+          panel.background = element_blank(),
+          axis.ticks = element_blank(),
+          axis.title = element_blank()) +
+    geom_linerange(past, mapping=aes(x=day_no, ymin=lower, ymax=upper), colour = &amp;quot;wheat2&amp;quot;)
+
+p &amp;lt;- p + 
+    geom_linerange(past, mapping=aes(x=day_no, ymin=q1, ymax=q3), colour = &amp;quot;wheat4&amp;quot;)
+
+p &amp;lt;- p + 
+    geom_line(present, mapping=aes(x=day_no, y=temp, group=1)) +
+    geom_vline(xintercept = 0, colour = &amp;quot;wheat4&amp;quot;, linetype=1, size=1)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Sedan fixar vi till det lite som Tufte gillar, med vita horisontella linjer och prickade vertikala linjer, samt lägger till månadernas namn längs x-axeln.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p &amp;lt;- p + 
+    geom_hline(yintercept = -25, colour = &amp;quot;white&amp;quot;, linetype=1) +
+    geom_hline(yintercept = -20, colour = &amp;quot;white&amp;quot;, linetype=1) +
+    geom_hline(yintercept = -15, colour = &amp;quot;white&amp;quot;, linetype=1) +
+    geom_hline(yintercept = -10, colour = &amp;quot;white&amp;quot;, linetype=1) +
+    geom_hline(yintercept = -5, colour = &amp;quot;white&amp;quot;, linetype=1) +
+    geom_hline(yintercept = 0, colour = &amp;quot;white&amp;quot;, linetype=1) +
+    geom_hline(yintercept = 5, colour = &amp;quot;white&amp;quot;, linetype=1) +
+    geom_hline(yintercept = 10, colour = &amp;quot;white&amp;quot;, linetype=1) +
+    geom_hline(yintercept = 15, colour = &amp;quot;white&amp;quot;, linetype=1) +
+    geom_hline(yintercept = 20, colour = &amp;quot;white&amp;quot;, linetype=1) +
+    geom_hline(yintercept = 25, colour = &amp;quot;white&amp;quot;, linetype=1) +
+    geom_hline(yintercept = 30, colour = &amp;quot;white&amp;quot;, linetype=1) +
+    geom_hline(yintercept = 35, colour = &amp;quot;white&amp;quot;, linetype=1) 
+
+p &amp;lt;- p + 
+    geom_vline(xintercept = 31, colour = &amp;quot;wheat4&amp;quot;, linetype=3, size=.5) +
+    geom_vline(xintercept = 59, colour = &amp;quot;wheat4&amp;quot;, linetype=3, size=.5) +
+    geom_vline(xintercept = 90, colour = &amp;quot;wheat4&amp;quot;, linetype=3, size=.5) +
+    geom_vline(xintercept = 120, colour = &amp;quot;wheat4&amp;quot;, linetype=3, size=.5) +
+    geom_vline(xintercept = 151, colour = &amp;quot;wheat4&amp;quot;, linetype=3, size=.5) +
+    geom_vline(xintercept = 181, colour = &amp;quot;wheat4&amp;quot;, linetype=3, size=.5) +
+    geom_vline(xintercept = 212, colour = &amp;quot;wheat4&amp;quot;, linetype=3, size=.5) +
+    geom_vline(xintercept = 243, colour = &amp;quot;wheat4&amp;quot;, linetype=3, size=.5) +
+    geom_vline(xintercept = 273, colour = &amp;quot;wheat4&amp;quot;, linetype=3, size=.5) +
+    geom_vline(xintercept = 304, colour = &amp;quot;wheat4&amp;quot;, linetype=3, size=.5) +
+    geom_vline(xintercept = 334, colour = &amp;quot;wheat4&amp;quot;, linetype=3, size=.5) +
+    geom_vline(xintercept = 365, colour = &amp;quot;wheat4&amp;quot;, linetype=3, size=.5) 
+
+p &amp;lt;- p +
+    coord_cartesian(ylim = c(-25,35)) +
+    scale_y_continuous(breaks = seq(-25,35, by=5), labels = a) +
+    scale_x_continuous(expand = c(0, 5), 
+                       breaks = c(15,45,75,105,135,165,195,228,258,288,320,350),
+                       labels = c(&amp;quot;Januari&amp;quot;, &amp;quot;Februari&amp;quot;, &amp;quot;Mars&amp;quot;, &amp;quot;April&amp;quot;,
+                                  &amp;quot;Maj&amp;quot;, &amp;quot;Juni&amp;quot;, &amp;quot;Juli&amp;quot;, &amp;quot;Augusti&amp;quot;, &amp;quot;September&amp;quot;,
+                                  &amp;quot;Oktober&amp;quot;, &amp;quot;November&amp;quot;, &amp;quot;December&amp;quot;))&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Sedan kan vi markera de dagar som hade rekordhög eller rekordlåg temperatur.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p &amp;lt;- p +
+    geom_point(data=present_lows, aes(x=day_no, y=temp), colour=&amp;quot;blue3&amp;quot;) +
+    geom_point(data=present_highs, aes(x=day_no, y=temp), colour=&amp;quot;firebrick3&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Och slutligen lägger vi till rubrik, förklarande texter och legend. Den här delen av koden kan utvecklas så att det inte är så mycket manuell anpassning. Det vore att föredra om man vill köra samma kod för någon annan stad. Men det får ligga på listan över saker att göra.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;p &amp;lt;- p +
+    ggtitle(&amp;quot;Vädret i Stockholm 2016&amp;quot;) +
+    theme(plot.title=element_text(face=&amp;quot;bold&amp;quot;,hjust=.012,vjust=.8,colour=&amp;quot;#3C3C3C&amp;quot;,size=20)) +
+    annotate(&amp;quot;text&amp;quot;, x = 5, y = 37.5, label = &amp;quot;Medeltemperatur&amp;quot;, size=4, fontface=&amp;quot;bold&amp;quot;, hjust = 0)
+
+#print(p)
+
+p &amp;lt;- p +
+    annotate(&amp;quot;text&amp;quot;, x = 5, y = 35, 
+             label = &amp;quot;Data avser dygnsmedeltemperatur för Stockholm år 2016 i förhållande till&amp;quot;, 
+             size=3, colour=&amp;quot;gray30&amp;quot;, hjust = 0) +
+    annotate(&amp;quot;text&amp;quot;, x = 5, y = 33, 
+             label = &amp;quot;hur det har sett ut 1961-2014. Genomsnittstemperaturen för hela 2016 var 8,2°,&amp;quot;, 
+             size=3, colour=&amp;quot;gray30&amp;quot;, hjust = 0) +
+    annotate(&amp;quot;text&amp;quot;, x = 5, y = 31, 
+             label = &amp;quot;vilket är 1° över genomsnittet för 1961-2015. Data kommer från SMHI.&amp;quot;, 
+             size=3, colour=&amp;quot;gray30&amp;quot;, hjust = 0) +
+    annotate(&amp;quot;text&amp;quot;, x = 5, y = 29, label = &amp;quot;Grafen är gjord av Richard Öhrvall 2017, @richardohrvall&amp;quot;, 
+             size=3, colour=&amp;quot;gray30&amp;quot;, hjust = 0)
+
+p &amp;lt;- p +
+    annotate(&amp;quot;segment&amp;quot;, x = 311, xend = 308, y = -2.8, yend = -7, colour = &amp;quot;blue3&amp;quot;) +
+    annotate(&amp;quot;text&amp;quot;, x = 306, y = -7, label = &amp;quot;Vi hade 4 dagar som var de&amp;quot;, size=3, colour=&amp;quot;blue3&amp;quot;, hjust = 1) +
+    annotate(&amp;quot;text&amp;quot;, x = 306, y = -9, label = &amp;quot;kallaste sedan 1961&amp;quot;, size=3, colour=&amp;quot;blue3&amp;quot;, hjust = 1) +
+    annotate(&amp;quot;segment&amp;quot;, x = 258, xend = 263, y = 18.2, yend = 25, colour = &amp;quot;firebrick3&amp;quot;) +
+    annotate(&amp;quot;text&amp;quot;, x = 265, y = 28, label = &amp;quot;Vi hade 7 dagar som var de&amp;quot;, size=3, colour=&amp;quot;firebrick3&amp;quot;, hjust = 0) +
+    annotate(&amp;quot;text&amp;quot;, x = 265, y = 26, label = &amp;quot;varmaste sedan 1961&amp;quot;, size=3, colour=&amp;quot;firebrick3&amp;quot;, hjust = 0)
+
+p &amp;lt;- p +
+    annotate(&amp;quot;segment&amp;quot;, x = 181, xend = 181, y = -15, yend = -5, colour = &amp;quot;wheat2&amp;quot;, size=3) +
+    annotate(&amp;quot;segment&amp;quot;, x = 181, xend = 181, y = -12, yend = -8, colour = &amp;quot;wheat4&amp;quot;, size=3) +
+    geom_line(data=legend_data, aes(x=x,y=y)) +
+    annotate(&amp;quot;segment&amp;quot;, x = 183, xend = 185, y = -11.9, yend = -11.9, colour = &amp;quot;wheat4&amp;quot;, size=.5) +
+    annotate(&amp;quot;segment&amp;quot;, x = 183, xend = 185, y = -7.9, yend = -7.9, colour = &amp;quot;wheat4&amp;quot;, size=.5) +
+    annotate(&amp;quot;segment&amp;quot;, x = 185, xend = 185, y = -7.9, yend = -11.9, colour = &amp;quot;wheat4&amp;quot;, size=.5) +
+    annotate(&amp;quot;text&amp;quot;, x = 186, y = -9, label = &amp;quot;Normal medeltemperatur&amp;quot;, size=2.5, colour=&amp;quot;gray30&amp;quot;, hjust = 0) +
+    annotate(&amp;quot;text&amp;quot;, x = 186, y = -11, label = &amp;quot;(innefattar hälften av åren)&amp;quot;, size=2.5, colour=&amp;quot;gray30&amp;quot;, hjust = 0) +
+    annotate(&amp;quot;text&amp;quot;, x = 172, y = -10, label = &amp;quot;2016 års medeltemperatur&amp;quot;, size=2.5, colour=&amp;quot;gray30&amp;quot;, hjust = 1) +
+    annotate(&amp;quot;text&amp;quot;, x = 184, y = -5.2, label = &amp;quot;Högsta medeltemperatur&amp;quot;, size=2.5, colour=&amp;quot;gray30&amp;quot;, hjust = 0) +
+    annotate(&amp;quot;text&amp;quot;, x = 184, y = -14.3, label = &amp;quot;Lägsta medeltemperatur&amp;quot;, size=2.5, colour=&amp;quot;gray30&amp;quot;, hjust = 0)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Sedan är det bara att ta fram grafen. Visst ser den helt ok ut?&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;print(p)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;#####../content/post/2017-01-23-visualisering-av-vädret-i-stockholm_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 
 
 &lt;!-- BLOGDOWN-HEAD
