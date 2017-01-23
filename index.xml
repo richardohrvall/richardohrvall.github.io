@@ -10,11 +10,11 @@
     <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     
     <item>
-      <title>Visualisering av vädret i Stockholm</title>
-      <link>/2017/01/23/visualisering-av-v%C3%A4dret-i-stockholm/</link>
+      <title>Visualisering av temperaturen i Stockholm 2016</title>
+      <link>/2017/01/23/visualisering-av-temperaturen-i-stockholm-2016/</link>
       <pubDate>Mon, 23 Jan 2017 21:02:05 +0100</pubDate>
       
-      <guid>/2017/01/23/visualisering-av-v%C3%A4dret-i-stockholm/</guid>
+      <guid>/2017/01/23/visualisering-av-temperaturen-i-stockholm-2016/</guid>
       <description>&lt;!-- BLOGDOWN-BODY-BEFORE
 
 /BLOGDOWN-BODY-BEFORE --&gt;
@@ -202,7 +202,7 @@ p &amp;lt;- p +
     annotate(&amp;quot;text&amp;quot;, x = 184, y = -14.3, label = &amp;quot;Lägsta medeltemperatur&amp;quot;, size=2.5, colour=&amp;quot;gray30&amp;quot;, hjust = 0)&lt;/code&gt;&lt;/pre&gt;
 &lt;p&gt;Sedan är det bara att ta fram grafen. Visst ser den helt ok ut?&lt;/p&gt;
 &lt;pre class=&#34;r&#34;&gt;&lt;code&gt;print(p)&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;&lt;img src=&#34;#####../content/post/2017-01-23-visualisering-av-vädret-i-stockholm_files/figure-html/unnamed-chunk-8-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;#####../content/post/2017-01-23-visualisering-av-temperaturen-i-stockholm_files/figure-html/weather_sthm-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
 
 
 &lt;!-- BLOGDOWN-HEAD
